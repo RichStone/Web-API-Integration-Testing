@@ -20,7 +20,9 @@ class ContactsControllerTest < ActionDispatch::IntegrationTest
 
   test "should show contact" do
     get contact_url(@contact), as: :json
+
     assert_response :success
+    assert_equal @contact.as_json, JSON.parse(response.body)
   end
 
   test "should update contact" do
