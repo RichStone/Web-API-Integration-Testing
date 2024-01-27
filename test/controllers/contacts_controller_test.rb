@@ -18,19 +18,33 @@ class ContactsControllerTest < ActionDispatch::IntegrationTest
     assert_response :created
   end
 
-  test "should show contact" do
-    get contact_url(@contact), as: :json
-    parsed_response = JSON.parse(response.body)
+  test "#show responds with the serialized contact" do
+    # Creating the contact in the test directly helps specifying requirements,
+    # improving the tests-as-code state, and readability:
+    contact = Contact.create(
+      id: 0,
+      email_address: "hey@richsteinmetz.com",
+      first_name: "Rich",
+      last_name: "Steinmetz",
+      nick: "RichRich",
+      age: 130,
+      created_at: DateTime.parse("2024-01-27T15:51:05.981Z"),
+      updated_at: DateTime.parse("2024-01-27T15:51:05.981Z")
+    )
+    get contact_url(contact), as: :json
 
-    assert_response :success
-    assert_equal @contact.id, parsed_response["id"]
-    assert_equal @contact.email_address, parsed_response["email_address"]
-    assert_equal @contact.first_name, parsed_response["first_name"]
-    assert_equal @contact.last_name, parsed_response["last_name"]
-    assert_equal @contact.nick, parsed_response["nick"]
-    assert_equal @contact.age, parsed_response["age"]
-    assert_equal @contact.updated_at.as_json, parsed_response["updated_at"]
-    assert_equal @contact.created_at.as_json, parsed_response["created_at"]
+    assert_response 200
+    expected = {
+      id: 0,
+      email_address: "hey@richsteinmetz.com",
+      first_name: "Rich",
+      last_name: "Steinmetz",
+      nick: "RichRich",
+      age: 130,
+      created_at: "2024-01-27T15:51:05.981Z",
+      updated_at: "2024-01-27T15:51:05.981Z"
+    }
+    assert_equal expected.to_json, response.body
   end
 
   test "should update contact" do
